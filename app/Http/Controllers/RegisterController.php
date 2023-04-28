@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRegisterRequest;
 use App\Http\Requests\UpdateRegisterRequest;
 use App\Models\Register;
+use App\Models\Category;
+use App\Models\User;
+use Inertia\Inertia;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -13,15 +19,9 @@ class RegisterController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $registers = Register::with('category')->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return Inertia::render('Dashboard', ['registers' => $registers]);
     }
 
     /**
@@ -29,7 +29,37 @@ class RegisterController extends Controller
      */
     public function store(StoreRegisterRequest $request)
     {
-        //
+        $validate = $request->validate([
+            'category_id' => 'required',
+            'name' => 'required|max:150',
+            'email' => 'required|unique:registers|max:150',
+            'address' => 'required|max:150',
+            'phone' => 'max:15',
+            'mobile' => 'max:15',
+            'city' => 'required|max:100',
+            'state' => 'required|max:2',
+            'picture' => 'max:60000',
+            'birthday' => 'date',
+            'observations' => 'max:150',
+        ], [
+            'picture.max' => 'O arquivo deve ter até 40kb.'
+        ]);
+
+        $register = Register::create([
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'mobile' => $request->mobile,
+            'city' => $request->city,
+            'state' => $request->state,
+            'picture' => $request->picture,
+            'birthday' => $request->birthday,
+            'observations' => $request->observations,
+        ]);
+
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -37,7 +67,12 @@ class RegisterController extends Controller
      */
     public function show(Register $register)
     {
-        //
+        $categories = Category::all();
+
+        return Inertia::render(
+            'RegisterNew', 
+            ['categories' => $categories]
+        );
     }
 
     /**
@@ -45,7 +80,14 @@ class RegisterController extends Controller
      */
     public function edit(Register $register)
     {
-        //
+        $categories = Category::all();
+        $registerId = Register::find($register->id);
+
+        return Inertia::render(
+            'RegisterEdit', 
+            ['categories' => $categories, 
+            'register' => $registerId]
+        );
     }
 
     /**
@@ -53,7 +95,42 @@ class RegisterController extends Controller
      */
     public function update(UpdateRegisterRequest $request, Register $register)
     {
-        //
+        $validate = $request->validate([
+            'category_id' => 'required',
+            'name' => 'required|max:150',
+            'email' => 'required|max:150',
+            'address' => 'required|max:150',
+            'phone' => 'max:15',
+            'mobile' => 'max:15',
+            'city' => 'required|max:100',
+            'state' => 'required|max:2',
+            'picture' => 'max:60000',
+            'birthday' => 'date',
+            'observations' => 'max:150',
+        ], [
+            'picture.max' => 'O arquivo deve ter até 40kb.'
+        ]);
+
+        // Validator::make($request, [
+        //     'email' => 'required|unique:registers,email,'.$register->id,
+        //   ]);
+
+        $registerId = Register::find($register->id)
+            ->update([
+                'category_id' => $request->category_id,
+                'name' => $request->name,
+                'email' => $request->email,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'mobile' => $request->mobile,
+                'city' => $request->city,
+                'state' => $request->state,
+                'picture' => $request->picture,
+                'birthday' => $request->birthday,
+                'observations' => $request->observations,
+            ]);
+
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -61,6 +138,7 @@ class RegisterController extends Controller
      */
     public function destroy(Register $register)
     {
-        //
+        dd($register);
+        $registerId = Register::find($register->id)->delete();
     }
 }

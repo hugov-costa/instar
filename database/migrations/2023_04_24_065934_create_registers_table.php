@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('registers', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\RegisterDescription::class, 'description_id');
+            $table->foreignIdFor(\App\Models\Category::class, 'category_id');
             $table->string('name', 150);
             $table->string('email', 150);
             $table->string('address', 150);
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('mobile', 15);
             $table->string('city', 100);
             $table->char('state', 2);
-            $table->string('picture', 150);
+            $table->text('picture');
             $table->date('birthday');
             $table->text('observations');
             $table->timestamps();
