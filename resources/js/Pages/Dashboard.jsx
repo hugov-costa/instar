@@ -1,14 +1,14 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { useMemo } from "react";
+import { Inertia } from "@inertiajs/inertia";
 import MaterialReactTable from "material-react-table";
-import { Box, IconButton } from "@mui/material";
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Email as EmailIcon,
 } from "@mui/icons-material";
-import axios from "axios";
+import { Box, IconButton } from "@mui/material";
+import { useMemo } from "react";
 
 export default function Dashboard({ auth, registers: data }) {
     const columns = useMemo(
@@ -19,7 +19,7 @@ export default function Dashboard({ auth, registers: data }) {
             },
             {
                 accessorKey: "email",
-                header: "Categoria",
+                header: "E-mail",
             },
 
             {
@@ -75,7 +75,13 @@ export default function Dashboard({ auth, registers: data }) {
                                     </IconButton>
                                     <IconButton
                                         color="error"
-                                        onClick={(e) => e.preventDefault()}
+                                        onClick={() =>
+                                            Inertia.delete(
+                                                route("contact.delete", [
+                                                    row.original.id,
+                                                ])
+                                            )
+                                        }
                                     >
                                         <DeleteIcon />
                                     </IconButton>

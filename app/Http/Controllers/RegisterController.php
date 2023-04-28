@@ -42,6 +42,7 @@ class RegisterController extends Controller
             'birthday' => 'date',
             'observations' => 'max:150',
         ], [
+            'email.unique' => 'O e-mail já está sendo utilizado.',
             'picture.max' => 'O arquivo deve ter até 40kb.'
         ]);
 
@@ -98,7 +99,7 @@ class RegisterController extends Controller
         $validate = $request->validate([
             'category_id' => 'required',
             'name' => 'required|max:150',
-            'email' => 'required|max:150',
+            'email' => 'required|max:150|unique:registers,email,'.$register->id,
             'address' => 'required|max:150',
             'phone' => 'max:15',
             'mobile' => 'max:15',
@@ -108,12 +109,9 @@ class RegisterController extends Controller
             'birthday' => 'date',
             'observations' => 'max:150',
         ], [
+            'email.unique' => 'O e-mail já está sendo utilizado.',
             'picture.max' => 'O arquivo deve ter até 40kb.'
         ]);
-
-        // Validator::make($request, [
-        //     'email' => 'required|unique:registers,email,'.$register->id,
-        //   ]);
 
         $registerId = Register::find($register->id)
             ->update([
@@ -138,7 +136,8 @@ class RegisterController extends Controller
      */
     public function destroy(Register $register)
     {
-        dd($register);
-        $registerId = Register::find($register->id)->delete();
+        $registerId = Register::find($register->id)->forceDelete();
+
+        return redirect()->route('dashboard');
     }
 }
